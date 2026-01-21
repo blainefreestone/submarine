@@ -1,0 +1,14 @@
+pwm_controller:
+  frequency: 50
+  address: 0x40
+
+servos:
+  - name: upper_rudder
+    channel: 0
+
+  - name: lower_rudder
+    channel: 1
+
+motors:
+  - name: propeller
+    channel: 2
