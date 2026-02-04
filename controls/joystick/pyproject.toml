@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "submarine-joystick"
+version = "0.1.0"
+description = "Joystick controller for submarine actuators"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pygame>=2.5.0",
+    "pyserial>=3.5",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+submarine-joystick = "joystick.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

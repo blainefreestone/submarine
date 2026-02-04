@@ -1,0 +1,32 @@
+# Joystick Controller Configuration
+
+joystick:
+  device_index: 0
+
+serial:
+  port: "/dev/ttyUSB0"  # Serial port for ESP32 communication
+  baudrate: 115200
+  timeout: 0.1
+  send_rate_hz: 30
+
+axes:
+  - name: "rutter"
+    axis_index: 0
+    deadzone: 0.05
+    invert: false
+    output_min: -45
+    output_max: 45
+    target_servo_id: 1
+    epsilon: 2 
+    move_time_ms: 1
+
+# Future: Add button and hat configurations here
+# buttons:
+#   - name: "emergency_stop"
+#     button_index: 0
+#     command: "STOP"
+#
+# hats:
+#   - name: "camera_control"
+#     hat_index: 0
+#     servo_id: 3
