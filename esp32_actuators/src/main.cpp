@@ -3,7 +3,8 @@
 #include "managers/device_manager.h"
 #include "communication/command_parser.h"
 #include "drivers/hiwonder_servo.h"
-#include "drivers/dc_motor.h"
+
+#define USB_BAUD_RATE 115200
 
 // Global device instances
 HiWonderServo servo1(Serial1, SERVO_1_ID);

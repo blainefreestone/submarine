@@ -109,18 +109,18 @@ void HiWonderServo::load() {
     sendFrame(id_, CMD_LOAD_OR_UNLOAD_WRITE, &payload, 1);
 }
 
-void HiWonderServo::unload() {servo_id,
-                               uint8_t command,
-                               const uint8_t* payload,
-                               uint8_t payload_len) {
-    uint8_t buf[16];
-    uint8_t len = payload_len + 3;
 
-    buf[0] = FRAME_HEADER;
-    buf[1] = FRAME_HEADER;
-    buf[2] = servo_Servo::setAngleLimits(float min_deg, float max_deg) {
-    min_angle_ = min_deg;
-    max_angle_ = max_deg;
+// In hiwonder_servo.cpp
+void HiWonderServo::unload() {
+    // 0x14 is the Unload command for HiWonder/Lewansoul servos
+    uint8_t packet[] = { 0x55, 0x55, id_, 0x04, 0x14, 0x00 }; 
+    // Calculate checksum here if your driver requires it
+    serial_.write(packet, sizeof(packet)); // Use serial_ instead of _serial
+}
+
+void HiWonderServo::setAngleLimits(float min_angle, float max_angle) {
+    min_angle_ = min_angle;
+    max_angle_ = max_angle;
 }
 
 void HiWonderServo::setPositionLimits(uint16_t min_pos,
