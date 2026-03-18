@@ -37,6 +37,19 @@ bool CommandParser::parseAndExecute(const char* cmd_str) {
         return true;
     }
 
+    // Parametric command: LIGHT,<state>
+    if (strncmp(work_buf, "LIGHT,", 6) == 0) {
+        char* state_str = strtok(work_buf + 6, ",");
+        if (state_str) {
+            int state = atoi(state_str);
+            if (state == 1 || state == 0) {
+                digitalWrite(LIGHT_GPIO_PIN, state ? HIGH : LOW);
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Parametric commands: SERVO,1,angle,90...
     char* type = strtok(work_buf, ",");
     char* id_str = strtok(NULL, ",");

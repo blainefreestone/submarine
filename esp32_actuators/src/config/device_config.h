@@ -19,3 +19,6 @@ static constexpr float SERVO_1_ANGLE_MAX = 120.0f;
 static constexpr uint16_t SERVO_1_POS_MIN = 0;
 static constexpr uint16_t SERVO_1_POS_MAX = 1000;
 static constexpr uint16_t SERVO_1_CENTER = 500;
+
+// GPIO pin for light control
+static constexpr uint8_t LIGHT_GPIO_PIN = 25;

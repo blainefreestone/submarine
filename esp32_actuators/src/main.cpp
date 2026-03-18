@@ -27,6 +27,10 @@ void setup() {
     servo1.setPositionLimits(SERVO_1_POS_MIN, SERVO_1_POS_MAX);
     servo1.setCenter(SERVO_1_CENTER);
 
+    // Initialize light GPIO pin
+    pinMode(LIGHT_GPIO_PIN, OUTPUT);
+    digitalWrite(LIGHT_GPIO_PIN, LOW);  // Ensure light is off at startup
+
     // Register all devices with the manager
     DeviceManager& mgr = DeviceManager::getInstance();
     
