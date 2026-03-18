@@ -33,5 +33,9 @@ axes:
 
 buttons:
   - name: "toggle_light"
-    button_index: 3  # Assuming L3 is button index 9
+    button_index: 3  # L3 on joystick
     command: "TOGGLE_LIGHT"
+
+  - name: "read_pressure"
+    button_index: 1  # L1 on joystick
+    command: "PRESSURE"

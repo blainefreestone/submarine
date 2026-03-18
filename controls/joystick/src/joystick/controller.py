@@ -8,7 +8,7 @@ import yaml
 
 from joystick.reader import JoystickReader
 from joystick.mapping import AxisConfig, AxisMapper
-from joystick.comms.serial_link import SerialLink, ServoCommand, MotorCommand, LightCommand
+from joystick.comms.serial_link import SerialLink, ServoCommand, MotorCommand, LightCommand, PressureCommand
 
 
 logger = logging.getLogger(__name__)
@@ -154,6 +154,11 @@ class JoystickController:
                     light_command = LightCommand(self.light_state)
                     self.serial_link.send_command(light_command)
                     logger.info(f"[Button: {name}] Light toggled to {'ON' if self.light_state else 'OFF'}")
+
+                if command == "PRESSURE":
+                    pressure_command = PressureCommand()
+                    self.serial_link.send_command(pressure_command)
+                    logger.info(f"[Button: {name}] Pressure read command sent")
 
             self.button_states[name] = buttons[index]
 

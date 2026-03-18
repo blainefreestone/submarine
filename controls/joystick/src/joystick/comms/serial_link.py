@@ -68,6 +68,11 @@ class LightCommand:
     def to_message(self) -> str:
         return f"LIGHT,{int(self.state)}\n"
 
+class PressureCommand(Command):
+    """Command to request a pressure reading."""
+
+    def to_message(self) -> str:
+        return "PRESSURE\n"
 
 class SerialLink:
     """Manages serial communication with the ESP32."""
@@ -153,6 +158,13 @@ class SerialLink:
             state: True to turn the light on, False to turn it off.
         """
         command = LightCommand(state)
+        self.send_command(command)
+
+    def send_pressure_request(self) -> None:
+        """
+        Send a pressure request command (convenience method).
+        """
+        command = PressureCommand()
         self.send_command(command)
 
     def close(self) -> None:
