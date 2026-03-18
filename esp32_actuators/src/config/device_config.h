@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <MS5837.h>
 
 /**
  * Device Configuration
@@ -22,3 +23,9 @@ static constexpr uint16_t SERVO_1_CENTER = 500;
 
 // GPIO pin for light control
 static constexpr uint8_t LIGHT_GPIO_PIN = 25;
+
+// I2C configurations for MS5837 sensor
+static constexpr uint8_t I2C_SDA_PIN = 21;  // Default SDA pin
+static constexpr uint8_t I2C_SCL_PIN = 22;  // Default SCL pin
+
+extern MS5837 sensor;

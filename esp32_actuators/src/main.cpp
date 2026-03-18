@@ -3,11 +3,16 @@
 #include "managers/device_manager.h"
 #include "communication/command_parser.h"
 #include "drivers/hiwonder_servo.h"
+#include <MS5837.h>
+#include <Wire.h>
 
 #define USB_BAUD_RATE 115200
 
 // Global device instances
 HiWonderServo servo1(Serial1, SERVO_1_ID);
+
+// Define the MS5837 sensor instance
+MS5837 sensor;
 
 void setup() {
     // Initialize USB serial for commands and debugging
@@ -31,6 +36,16 @@ void setup() {
     pinMode(LIGHT_GPIO_PIN, OUTPUT);
     digitalWrite(LIGHT_GPIO_PIN, LOW);  // Ensure light is off at startup
 
+    // Initialize I2C bus
+    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+
+    // Initialize the MS5837 sensor
+    if (!sensor.init()) {
+        Serial.println("ERROR: Unable to initialize MS5837 sensor");
+    } else {
+        Serial.println("MS5837 sensor initialized successfully");
+    }
+    sensor.setFluidDensity(997);
     // Register all devices with the manager
     DeviceManager& mgr = DeviceManager::getInstance();
     

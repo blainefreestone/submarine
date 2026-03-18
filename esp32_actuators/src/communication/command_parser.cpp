@@ -1,4 +1,5 @@
 #include "command_parser.h"
+#include "config/device_config.h"
 #include <Arduino.h>
 
 char CommandParser::command_buffer_[BUFFER_SIZE];
@@ -34,6 +35,17 @@ bool CommandParser::parseAndExecute(const char* cmd_str) {
     // Simple command: STOP_ALL
     if (strcmp(work_buf, "STOP_ALL") == 0) {
         DeviceManager::getInstance().stopAll();
+        return true;
+    }
+
+    // Simple command: PRESSURE
+    if (strcmp(work_buf, "PRESSURE") == 0) {
+        sensor.read();
+        float pressure = sensor.pressure();
+        float temperature = sensor.temperature();
+        float altitude = sensor.altitude();
+        float depth = sensor.depth();
+        Serial.printf("Pressure: %.2f mbar, Temperature: %.2f C, Altitude: %.2f m, Depth: %.2f m\n", pressure, temperature, altitude, depth);
         return true;
     }
 
