@@ -55,6 +55,20 @@ class MotorCommand(Command):
         return f"MOTOR,{self.motor_id},speed,{self.speed}\n"
 
 
+class LightCommand:
+    """Command to toggle the light on or off."""
+
+    def __init__(self, state: bool):
+        """
+        Args:
+            state: True to turn the light on, False to turn it off.
+        """
+        self.state = state
+
+    def to_message(self) -> str:
+        return f"LIGHT,{int(self.state)}\n"
+
+
 class SerialLink:
     """Manages serial communication with the ESP32."""
     
@@ -129,6 +143,16 @@ class SerialLink:
             speed: Motor speed
         """
         command = MotorCommand(motor_id, speed)
+        self.send_command(command)
+
+    def send_light(self, state: bool) -> None:
+        """
+        Send a light toggle command (convenience method).
+        
+        Args:
+            state: True to turn the light on, False to turn it off.
+        """
+        command = LightCommand(state)
         self.send_command(command)
 
     def close(self) -> None:

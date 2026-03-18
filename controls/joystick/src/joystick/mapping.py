@@ -7,7 +7,9 @@ class AxisConfig:
     """Configuration for a single joystick axis mapping."""
     name: str
     axis_index: int
-    target_servo_id: int
+    device_type: str = "servo"  # "servo" or "motor"
+    target_servo_id: int = 0
+    target_motor_id: int = 0
     deadzone: float = 0.05
     invert: bool = False
     output_min: float = 0.0
@@ -21,7 +23,9 @@ class AxisConfig:
         return cls(
             name=data["name"],
             axis_index=data["axis_index"],
-            target_servo_id=data["target_servo_id"],
+            device_type=data.get("device_type", "servo"),
+            target_servo_id=data.get("target_servo_id", 0),
+            target_motor_id=data.get("target_motor_id", 0),
             deadzone=data.get("deadzone", 0.05),
             invert=data.get("invert", False),
             output_min=data.get("output_min", 0.0),

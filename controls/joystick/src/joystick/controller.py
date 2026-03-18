@@ -8,7 +8,7 @@ import yaml
 
 from joystick.reader import JoystickReader
 from joystick.mapping import AxisConfig, AxisMapper
-from joystick.comms.serial_link import SerialLink, ServoCommand
+from joystick.comms.serial_link import SerialLink, ServoCommand, MotorCommand, LightCommand
 
 
 logger = logging.getLogger(__name__)
@@ -44,6 +44,10 @@ class JoystickController:
             for axis_data in self.config.get("axes", [])
         ]
         self.axis_mapper = AxisMapper(axis_configs)
+        
+        # Initialize button states
+        self.button_states = {button['name']: False for button in self.config.get('buttons', [])}
+        self.light_state = False  # Track light state
         
         # Control loop settings
         self.send_rate_hz = serial_config.get("send_rate_hz", 30)
@@ -89,6 +93,9 @@ class JoystickController:
                     if self.axis_mapper.should_send(axis_name, value):
                         self._send_axis_command(axis_name, value)
                 
+                # Process button presses
+                self._process_buttons(state.buttons)
+                
                 time.sleep(self.period)
                 
         except KeyboardInterrupt:
@@ -111,15 +118,45 @@ class JoystickController:
         
         value_int = int(round(value))
         
-        command = ServoCommand(
-            servo_id=config.target_servo_id,
-            angle=value_int,
-            move_time_ms=config.move_time_ms,
-        )
+        # Send appropriate command based on device type
+        if config.device_type == "motor":
+            command = MotorCommand(
+                motor_id=config.target_motor_id,
+                speed=value_int,
+            )
+            logger.info(f"[{axis_name}] MOTOR,{config.target_motor_id},speed,{value_int}")
+        else:  # servo
+            command = ServoCommand(
+                servo_id=config.target_servo_id,
+                angle=value_int,
+                move_time_ms=config.move_time_ms,
+            )
+            logger.info(f"[{axis_name}] SERVO,{config.target_servo_id},angle,{value_int},time,{config.move_time_ms}")
         
         self.serial_link.send_command(command)
-        logger.debug(f"{axis_name}: {value_int}")
     
+    def _process_buttons(self, buttons: list[int]) -> None:
+        """
+        Process button presses and execute associated commands.
+
+        Args:
+            buttons: List of current button states
+        """
+        for button_config in self.config.get("buttons", []):
+            name = button_config["name"]
+            index = button_config["button_index"]
+            command = button_config["command"]
+
+            if buttons[index] and not self.button_states[name]:
+                # Button pressed
+                if command == "TOGGLE_LIGHT":
+                    self.light_state = not self.light_state
+                    light_command = LightCommand(self.light_state)
+                    self.serial_link.send_command(light_command)
+                    logger.info(f"[Button: {name}] Light toggled to {'ON' if self.light_state else 'OFF'}")
+
+            self.button_states[name] = buttons[index]
+
     def cleanup(self) -> None:
         """Clean up resources when shutting down."""
         logger.info("Cleaning up...")
