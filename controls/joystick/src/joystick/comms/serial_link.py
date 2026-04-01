@@ -74,6 +74,20 @@ class PressureCommand(Command):
     def to_message(self) -> str:
         return "PRESSURE\n"
 
+class PumpCommand(Command):
+    """Command to control a pump's direction."""
+    
+    def __init__(self, direction: str):
+        """
+        Args:
+            direction: "FILL", "EMPTY", or "STOP"
+        """
+        self.direction = direction
+
+    def to_message(self) -> str:
+        return f"PUMP,{self.direction}\n"
+
+
 class SerialLink:
     """Manages serial communication with the ESP32."""
     
@@ -166,6 +180,10 @@ class SerialLink:
         """
         command = PressureCommand()
         self.send_command(command)
+
+    def send_pump(self, direction: str) -> None:
+        """Convenience method to send pump commands."""
+        self.send_command(PumpCommand(direction))
 
     def close(self) -> None:
         """Close the serial connection and stop the read thread."""

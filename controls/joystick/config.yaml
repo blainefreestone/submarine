@@ -31,6 +31,14 @@ axes:
     target_motor_id: 10  # ESC Motor ID from ESP32 config
     epsilon: 5  # Don't send unless change is at least 5%
 
+  - name: "pump"
+    axis_index: 4 
+    device_type: "pump"
+    deadzone: 0.1
+    invert: false
+    output_min: -100  # Full reverse
+    output_max: 100   # Full forward
+
 buttons:
   - name: "toggle_light"
     button_index: 3  # L3 on joystick

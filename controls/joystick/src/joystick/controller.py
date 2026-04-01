@@ -8,7 +8,7 @@ import yaml
 
 from joystick.reader import JoystickReader
 from joystick.mapping import AxisConfig, AxisMapper
-from joystick.comms.serial_link import SerialLink, ServoCommand, MotorCommand, LightCommand, PressureCommand
+from joystick.comms.serial_link import SerialLink, ServoCommand, MotorCommand, LightCommand, PressureCommand, PumpCommand
 
 
 logger = logging.getLogger(__name__)
@@ -48,6 +48,7 @@ class JoystickController:
         # Initialize button states
         self.button_states = {button['name']: False for button in self.config.get('buttons', [])}
         self.light_state = False  # Track light state
+        self.pump_states: dict[str, str] = {}
         
         # Control loop settings
         self.send_rate_hz = serial_config.get("send_rate_hz", 30)
@@ -125,13 +126,26 @@ class JoystickController:
                 speed=value_int,
             )
             logger.info(f"[{axis_name}] MOTOR,{config.target_motor_id},speed,{value_int}")
-        else:  # servo
+        elif config.device_type == "servo":
             command = ServoCommand(
                 servo_id=config.target_servo_id,
                 angle=value_int,
                 move_time_ms=config.move_time_ms,
             )
             logger.info(f"[{axis_name}] SERVO,{config.target_servo_id},angle,{value_int},time,{config.move_time_ms}")
+        elif config.device_type == "pump":
+            direction = "FILL" if value_int > 0 else "EMPTY" if value_int < 0 else "STOP"
+
+            last_direction = self.pump_states.get(axis_name, "STOP")
+            if direction in {"FILL", "EMPTY"}:
+                if last_direction != "STOP":
+                    return
+            elif direction == "STOP":
+                if last_direction == "STOP":
+                    return
+
+            command = PumpCommand(direction)
+            self.pump_states[axis_name] = direction
         
         self.serial_link.send_command(command)
     
