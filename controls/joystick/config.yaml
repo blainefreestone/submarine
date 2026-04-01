@@ -4,7 +4,7 @@ joystick:
   device_index: 0
 
 serial:
-  port: "/dev/ttyUSB0"  # Serial port for ESP32 communication
+  port: "COM7"  # Serial port for ESP32 communication
   baudrate: 115200
   timeout: 0.1
   send_rate_hz: 30
