@@ -4,9 +4,9 @@ joystick:
   device_index: 0
 
 serial:
-  port: "COM7"  # Serial port for ESP32 communication
+  port: "socket://192.168.1.1:3001"  # Serial port for ESP32 communication
   baudrate: 115200
-  timeout: 0.1
+  timeout: 1
   send_rate_hz: 30
 
 axes:
@@ -25,7 +25,7 @@ axes:
     axis_index: 2  # Y-axis (typically throttle)
     device_type: "motor"
     deadzone: 0.1
-    invert: false
+    invert: true
     output_min: -100  # Full reverse
     output_max: 100   # Full forward
     target_motor_id: 10  # ESC Motor ID from ESP32 config
