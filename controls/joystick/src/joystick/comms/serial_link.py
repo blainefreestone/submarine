@@ -97,14 +97,16 @@ class SerialLink:
         
         Args:
             port: Serial port path (e.g., "/dev/ttyUSB0")
-            baudrate: Communication baud rateport
+            baudrate: Communication baud rate port
             timeout: Read timeout in seconds
         """
+        #commented out because we are using serial insted of socket for controles
         # self.ser = serial.Serial(
         #     port=port,
         #     baudrate=baudrate,
         #     timeout=timeout,
         # )
+
         self.ser = serial.serial_for_url("socket://192.168.1.1:3001", timeout=1)
 
         self._running = True
