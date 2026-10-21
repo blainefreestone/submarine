@@ -4,16 +4,14 @@
 
 /**
  * Serial command parser for USB communication
- * Parses commands and routes them to appropriate devices
+ * Parses commands and routes them to appropriate devices/pins
  * 
  * Command format:
- * SERVO,<id>,angle,<deg>,time,<ms>     - Move servo to angle
- * MOTOR,<id>,speed,<0-255>,dir,<forward|reverse|brake>  - Control motor
- * PUMP,<id>,power,<0-255>              - Control pump (PWM)
- * SERVO,<id>,load                       - Load servo
- * SERVO,<id>,unload                     - Unload servo
- * STATUS                                - Print status of all devices
- * STOP_ALL                              - Emergency stop all devices
+ * M1:<val>,M2:<val>,M3:<val>,M4:<val>,PUMP:<dir>,SOL:<state>  - 4-Thruster & Ballast packet
+ * LIGHT,<state>                                               - Toggle underwater LED lights
+ * PRESSURE                                                    - Read MS5837 depth/pressure sensor
+ * STATUS                                                      - Print status of all devices
+ * STOP_ALL                                                    - Emergency stop all devices
  */
 class CommandParser {
 public:
@@ -41,7 +39,7 @@ private:
     static char error_msg_[128];
 
     /**
-     * Parse and execute a complete command
+     * Parse and execute a complete command string
      */
     static bool parseAndExecute(const char* cmd_str);
 

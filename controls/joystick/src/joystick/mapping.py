@@ -1,3 +1,4 @@
+"""Mapping module for processing joystick axes into motor and device commands."""
 from dataclasses import dataclass
 from typing import Any
 
@@ -7,15 +8,13 @@ class AxisConfig:
     """Configuration for a single joystick axis mapping."""
     name: str
     axis_index: int
-    device_type: str = "servo"  # "servo" or "motor"
-    target_servo_id: int = 0
+    device_type: str = "motor"  # "motor", "motor_group", or "pump"
     target_motor_id: int = 0
     deadzone: float = 0.05
     invert: bool = False
-    output_min: float = 0.0
-    output_max: float = 180.0
+    output_min: float = -100.0
+    output_max: float = 100.0
     epsilon: float = 1.0
-    move_time_ms: int = 50
     
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "AxisConfig":
@@ -23,15 +22,13 @@ class AxisConfig:
         return cls(
             name=data["name"],
             axis_index=data["axis_index"],
-            device_type=data.get("device_type", "servo"),
-            target_servo_id=data.get("target_servo_id", 0),
+            device_type=data.get("device_type", "motor"),
             target_motor_id=data.get("target_motor_id", 0),
             deadzone=data.get("deadzone", 0.05),
             invert=data.get("invert", False),
-            output_min=data.get("output_min", 0.0),
-            output_max=data.get("output_max", 180.0),
+            output_min=data.get("output_min", -100.0),
+            output_max=data.get("output_max", 100.0),
             epsilon=data.get("epsilon", 1.0),
-            move_time_ms=data.get("move_time_ms", 50),
         )
 
 
@@ -43,13 +40,6 @@ def apply_deadzone(value: float, deadzone: float) -> float:
     """
     Applies a symmetric deadzone around zero.
     Returns 0.0 if inside the deadzone.
-    
-    Args:
-        value: The input value to apply deadzone to
-        deadzone: The deadzone threshold
-        
-    Returns:
-        0.0 if |value| < deadzone, otherwise the original value
     """
     if abs(value) < deadzone:
         return 0.0
@@ -65,14 +55,6 @@ def normalize_axis(
     """
     Takes a raw joystick axis in [-1.0, +1.0] and returns
     a cleaned value in the same range.
-    
-    Args:
-        value: Raw axis value from joystick
-        deadzone: Deadzone threshold
-        invert: Whether to invert the axis direction
-        
-    Returns:
-        Normalized axis value in [-1.0, +1.0]
     """
     value = clamp(value, -1.0, 1.0)
 
@@ -91,30 +73,19 @@ def axis_to_range(
 ) -> float:
     """
     Maps [-1.0, +1.0] → [out_min, out_max]
-    
-    Args:
-        value: Normalized axis value in [-1.0, +1.0]
-        out_min: Minimum output value
-        out_max: Maximum output value
-        
-    Returns:
-        Mapped value in [out_min, out_max]
     """
     # Normalize to [0, 1]
     normalized = (value + 1.0) / 2.0
     return out_min + normalized * (out_max - out_min)
 
+
 def map_axis(raw_axes: list[float], config: AxisConfig) -> float:
     """
     Map a raw joystick axis to an output range using the provided configuration.
-    
-    Args:
-        raw_axes: List of raw axis values from the joystick
-        config: Axis configuration specifying mapping parameters
-        
-    Returns:
-        Mapped axis value in the configured output range
     """
+    if config.axis_index >= len(raw_axes):
+        return 0.0
+
     raw_value = raw_axes[config.axis_index]
 
     cleaned = normalize_axis(
@@ -136,9 +107,6 @@ class AxisMapper:
     def __init__(self, configs: list[AxisConfig]):
         """
         Initialize the axis mapper with a list of axis configurations.
-        
-        Args:
-            configs: List of AxisConfig objects defining axis mappings
         """
         self.configs = configs
         self.last_values: dict[str, float] = {}
@@ -146,12 +114,6 @@ class AxisMapper:
     def process_axes(self, raw_axes: list[float]) -> dict[str, float]:
         """
         Process all configured axes and return mapped values.
-        
-        Args:
-            raw_axes: List of raw axis values from the joystick
-            
-        Returns:
-            Dictionary mapping axis names to their mapped values
         """
         results = {}
         for config in self.configs:
@@ -162,13 +124,6 @@ class AxisMapper:
     def should_send(self, name: str, value: float) -> bool:
         """
         Check if a value has changed enough to warrant sending an update.
-        
-        Args:
-            name: Name of the axis to check
-            value: Current value of the axis
-            
-        Returns:
-            True if the value should be sent, False otherwise
         """
         config = next((c for c in self.configs if c.name == name), None)
         if config is None:
@@ -183,12 +138,5 @@ class AxisMapper:
     def get_config(self, name: str) -> AxisConfig | None:
         """
         Get the configuration for a specific axis by name.
-        
-        Args:
-            name: Name of the axis
-            
-        Returns:
-            AxisConfig if found, None otherwise
         """
         return next((c for c in self.configs if c.name == name), None)
-

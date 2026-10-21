@@ -8,23 +8,19 @@
  * Define all actuators and their pins here
  */
 
-// Serial communication pins for HiWonder servos
-static constexpr uint8_t SERVO_TX_PIN = 17;
-static constexpr uint8_t SERVO_RX_PIN = 16;
-static constexpr uint32_t SERVO_BAUD_RATE = 115200;
+// --- L298N BALLAST & SOLENOID PINS ---
+// Channel A: Ballast Water Pump
+static constexpr uint8_t PUMP_IN1_PIN = 26;
+static constexpr uint8_t PUMP_IN2_PIN = 25;
 
-// Servo definitions
-static constexpr uint8_t SERVO_1_ID = 1;
-static constexpr float SERVO_1_ANGLE_MIN = -120.0f;
-static constexpr float SERVO_1_ANGLE_MAX = 120.0f;
-static constexpr uint16_t SERVO_1_POS_MIN = 0;
-static constexpr uint16_t SERVO_1_POS_MAX = 1000;
-static constexpr uint16_t SERVO_1_CENTER = 500;
+// Channel B: Solenoid Valve Control
+static constexpr uint8_t SOL_IN3_PIN = 33;
+static constexpr uint8_t SOL_IN4_PIN = 32; // Tied LOW for unidirectional control
 
-// GPIO pin for light control
-static constexpr uint8_t LIGHT_GPIO_PIN = 25;
+// --- GPIO PIN FOR LIGHT CONTROL ---
+static constexpr uint8_t LIGHT_GPIO_PIN = 14;
 
-// I2C configurations for MS5837 sensor
+// --- I2C CONFIGURATIONS FOR MS5837 SENSOR ---
 static constexpr uint8_t I2C_SDA_PIN = 21;  // Default SDA pin
 static constexpr uint8_t I2C_SCL_PIN = 22;  // Default SCL pin
 
