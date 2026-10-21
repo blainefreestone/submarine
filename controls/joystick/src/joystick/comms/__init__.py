@@ -1,10 +1,21 @@
 """Communication modules for serial links."""
 
-from joystick.comms.serial_link import SerialLink, Command, ServoCommand, MotorCommand
+from joystick.comms.serial_link import (
+    SerialLink,
+    Command,
+    MotorCommand,
+    LightCommand,
+    PressureCommand,
+    PumpCommand,
+    SolenoidOverrideCommand,
+)
 
 __all__ = [
     "SerialLink",
     "Command",
-    "ServoCommand",
     "MotorCommand",
+    "LightCommand",
+    "PressureCommand",
+    "PumpCommand",
+    "SolenoidOverrideCommand",
 ]
