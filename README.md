@@ -10,4 +10,5 @@ Group project for ECEN 461 (Advanced Embedded Systems)
 
 Final project for professional career development
 
-*Brock Davis
+* Brock Davis
+If you want further updates on the design, go to https://github.com/brockdavis2002/2026_Submarine-updated_design
