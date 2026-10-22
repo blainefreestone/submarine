@@ -1,18 +1,35 @@
 #include <Arduino.h>
+#include <Servo.h>
+#include <Wire.h>
+#include <MS5837.h>
 #include "config/device_config.h"
 #include "managers/device_manager.h"
 #include "communication/command_parser.h"
-#include <MS5837.h>
-#include <Wire.h>
 
 #define USB_BAUD_RATE 115200
+
+// --- SECONDARY HARDWARE SERIAL (UART2) PINS ---
+// Dedicated for communication with the Raspberry Pi (Pins 16 & 17)
+#define RXD2 16
+#define TXD2 17
+#define SECONDARY_BAUD_RATE 9600
+
+// --- THRUSTER PIN DEFINITIONS (ZTW Shark G2 ESCs) ---
+#define M1_PIN 4
+#define M2_PIN 18
+#define M3_PIN 19
+#define M4_PIN 23
+
+// Create Servo objects for the 4 thrusters
+Servo thrusterM1;
+Servo thrusterM2;
+Servo thrusterM3;
+Servo thrusterM4;
 
 // Define the MS5837 sensor instance
 MS5837 sensor;
 
 // --- L298N MOTOR DRIVER PIN DEFINITIONS FOR BALLAST & SOLENOID ---
-// (Ensure these pin constants are also defined in your device_config.h, 
-// or update them here to match your physical ESP32 wiring)
 #ifndef PUMP_IN1_PIN
 #define PUMP_IN1_PIN 26
 #endif
@@ -27,10 +44,29 @@ MS5837 sensor;
 #endif
 
 void setup() {
-    // Initialize USB serial for commands and debugging
+    // Initialize USB serial for workbench debugging (Uses USB TX=1, RX=3)
     Serial.begin(USB_BAUD_RATE);
     delay(1000);  // Wait for serial connection
-    
+
+    // Initialize Secondary Hardware Serial (UART2) on pins 16 & 17 for the Raspberry Pi
+    Serial2.begin(SECONDARY_BAUD_RATE, SERIAL_8N1, RXD2, TXD2);
+    Serial.println("UART2 initialized on pins 16 (RX2) and 17 (TX2) for Raspberry Pi link.");
+
+    // --- THRUSTER ESC INITIALIZATION & ARMING ---
+    thrusterM1.attach(M1_PIN, 1000, 2000);
+    thrusterM2.attach(M2_PIN, 1000, 2000);
+    thrusterM3.attach(M3_PIN, 1000, 2000);
+    thrusterM4.attach(M4_PIN, 1000, 2000);
+
+    // Send neutral (1500µs) stop signal to arm the ZTW Shark G2 ESCs
+    Serial.println("Arming ESCs (sending neutral pulse)...");
+    thrusterM1.writeMicroseconds(1500);
+    thrusterM2.writeMicroseconds(1500);
+    thrusterM3.writeMicroseconds(1500);
+    thrusterM4.writeMicroseconds(1500);
+    delay(2000); // Give ESCs time to initialize and emit arming confirmation beeps
+    Serial.println("ESCs armed successfully!");
+
     // Initialize light GPIO pin
     pinMode(LIGHT_GPIO_PIN, OUTPUT);
     digitalWrite(LIGHT_GPIO_PIN, LOW);  // Ensure light is off at startup
@@ -65,17 +101,11 @@ void setup() {
     delay(500);
     mgr.printStatus();
     
-    Serial.println("\nReady for commands!");
-    Serial.println("Send commands like:");
-    Serial.println("  PUMP,FILL (or EMPTY / STOP)");
-    Serial.println("  SOL,1 (Manual override open) or SOL,0 (Closed)");
-    Serial.println("  LIGHTS,1 or LIGHTS,0");
-    Serial.println("  STATUS");
-    Serial.println("  STOP_ALL");
+    Serial.println("\nReady for operation!");
 }
 
 void loop() {
-    // Process incoming commands from USB serial
+    // Process incoming command packets from the Raspberry Pi over UART2
     CommandParser::update();
     
     // Update all devices managed by the DeviceManager

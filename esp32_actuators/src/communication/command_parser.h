@@ -3,15 +3,15 @@
 #include "managers/device_manager.h"
 
 /**
- * Serial command parser for USB communication
+ * Serial command parser for UART2 communication (Raspberry Pi to ESP32)
  * Parses commands and routes them to appropriate devices/pins
  * 
  * Command format:
  * M1:<val>,M2:<val>,M3:<val>,M4:<val>,PUMP:<dir>,SOL:<state>  - 4-Thruster & Ballast packet
- * LIGHT,<state>                                               - Toggle underwater LED lights
- * PRESSURE                                                    - Read MS5837 depth/pressure sensor
- * STATUS                                                      - Print status of all devices
- * STOP_ALL                                                    - Emergency stop all devices
+ * LIGHT,<state>                                             - Toggle underwater LED lights
+ * PRESSURE                                                  - Read MS5837 depth/pressure sensor
+ * STATUS                                                    - Print status of all devices
+ * STOP_ALL                                                  - Emergency stop all devices
  */
 class CommandParser {
 public:

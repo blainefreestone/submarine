@@ -1,4 +1,5 @@
 #include "device_manager.h"
+#include <Arduino.h>
 
 bool DeviceManager::registerDevice(Actuator* device) {
     if (device_count_ >= MAX_DEVICES) {
@@ -70,6 +71,14 @@ Actuator* DeviceManager::getDeviceAt(uint8_t index) {
 }
 
 void DeviceManager::printStatus() {
+    // Send status back over Serial2 so the Raspberry Pi receives it
+    Serial2.println("=== Device Status ===");
+    for (uint8_t i = 0; i < device_count_; i++) {
+        Serial2.printf("  %s\n", devices_[i]->getStatus());
+    }
+    Serial2.println("====================");
+    
+    // Optional: Also mirror to USB Serial if you happen to be plugged into a workbench computer
     Serial.println("=== Device Status ===");
     for (uint8_t i = 0; i < device_count_; i++) {
         Serial.printf("  %s\n", devices_[i]->getStatus());
